@@ -1,0 +1,77 @@
+#!/usr/bin/perl
+use strict;
+use warnings;
+use App::LogStats;
+
+my $stats = App::LogStats->new;
+$stats->run(@ARGV);
+
+__END__
+
+=head1 NAME
+
+stats - helps you to calculate data from lines
+
+
+=head1 SYNOPSIS
+
+    $ stats [options] FILE ...
+
+    or
+
+    $ cat FILE | stats [option]
+
+    options:
+             --file          file path
+        -f,  --fields        select only these fields to take stats
+        -d,  --delimiter     specify the delimiter to split the log
+             --more          calculate more results(NOTE: require more memory)
+        -t,  --through       STDIN is shown
+             --tsv           show the result as TSV
+             --csv           show the result as CSV
+        -di, --digit         number of the digit after decimal point(default:2)
+             --no-comma      not add the comma
+        -s,  --strict        treats only the strict numbers field
+        -h,  --help          show this help
+        -v,  --version       show the version
+
+
+=head1 EXAMPLE
+
+If you have the log file which include response time, and response time were logged the 7th element, for example you write the command like below
+
+    $ stats -f7 access_log
+
+then show the result like this
+
+    .------------------.
+    |         |      7 |
+    +---------+--------+
+    | count   |  3,096 |
+    | sum     | 747.20 |
+    +---------+--------+
+    | average |   0.24 |
+    +---------+--------+
+    | max     |   5.01 |
+    | min     |   0.01 |
+    | range   |      5 |
+    '---------+--------'
+
+
+=head1 AUTHOR
+
+Dai Okabayashi E<lt>bayashi@cpan.orgE<gt>
+
+
+=head1 SEE ALSO
+
+L<App::LogStats>
+
+
+=head1 LICENSE
+
+This module is free software; you can redistribute it and/or
+modify it under the same terms as Perl itself. See L<perlartistic>.
+
+
+=cut
