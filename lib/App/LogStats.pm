@@ -6,7 +6,7 @@ use Pod::Usage;
 use IO::Interactive qw/is_interactive/;
 use Text::ASCIITable;
 
-our $VERSION = '0.012';
+our $VERSION = '0.02';
 
 use Class::Accessor::Lite (
     new => 1,
@@ -22,6 +22,15 @@ our @RESULT_LIST = (qw/
 our %MORE_RESULT = (
     median => 1,
     mode   => 1,
+);
+
+our @DRAW_TABLE = (
+    [' ',' ','-',' '],
+    [' ',' ',' '],
+    [' ',' ','-',' '],
+    [' ',' ',' '],
+    [' ',' ','-',' '],
+    [' ',' ','-',' '],
 );
 
 sub run {
@@ -258,7 +267,7 @@ sub _put_table {
         $t->addRow($col, @rows);
     }
     print "\n" unless $self->config->{quiet};
-    print $t;
+    print $t->draw(@DRAW_TABLE);
 }
 
 sub _quote {
