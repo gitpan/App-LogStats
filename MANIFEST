@@ -7,8 +7,12 @@ MANIFEST			This list of files
 META.json
 META.yml
 README.pod
+share/log1
+share/log2
+share/log3
 t/00_compile.t
 t/01_basic.t
+t/02_run.t
 xt/01_perlcritic.t
 xt/02_pod-coverage.t
 xt/03_pod.t

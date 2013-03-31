@@ -1,4 +1,13 @@
 Revision history for Perl extension App::LogStats
 
-0.01    Sat Mar 30 22:06:56 JST 2013
+0.012   Sun Mar 31 18:23:26 JST 2013
+    [IMPROVEMENT]
+        - added some tests
+
+0.011   Sun Mar 31 16:20:02 JST 2013
+    [IMPROVEMENT]
+        - refactored routines(no logic changes) and few tiny fixes(for speed etc)
+        - added few tests
+
+0.01    Sun Mar 24 22:13:57 2013
         - original version

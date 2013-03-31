@@ -6,7 +6,7 @@ use Pod::Usage;
 use IO::Interactive qw/is_interactive/;
 use Text::ASCIITable;
 
-our $VERSION = '0.01';
+our $VERSION = '0.012';
 
 use Class::Accessor::Lite (
     new => 1,
@@ -26,92 +26,71 @@ our %MORE_RESULT = (
 
 sub run {
     my $self = shift;
-    $self->_prepare(\@_)->_loop->_finalize;
+    $self->_prepare(\@_)->_main->_finalize;
 }
 
-sub _finalize {
-    my $self = shift;
+sub _prepare {
+    my ($self, $argv) = @_;
 
-    return unless $self->result->{show_result};
+    my $config = +{};
+    $self->_merge_opt($config, $argv);
 
-    if ($self->config->{tsv}) {
-        $self->_put_delimited_line("\t");
+    $self->config($config);
+
+    $self;
+}
+
+sub _merge_opt {
+    my ($self, $config, $argv) = @_;
+
+    Getopt::Long::Configure('bundling');
+    GetOptionsFromArray(
+        $argv,
+        'file=s@'       => \$config->{file},
+        'd|delimiter=s' => \$config->{delimiter},
+        'f|fields=s'    => \$config->{fields},
+        't|through'     => \$config->{through},
+        'di|digit=i'    => \$config->{digit},
+        's|strict'      => \$config->{strict},
+        'no-comma'      => \$config->{no_comma},
+        'tsv'           => \$config->{tsv},
+        'csv'           => \$config->{csv},
+        'more'          => \$config->{more},
+        'h|help'        => sub {
+            pod2usage(1);
+        },
+        'v|version' => sub {
+            print "cl v$App::LogStats::VERSION\n";
+            exit 1;
+        },
+    ) or pod2usage(2);
+
+    push @{$config->{file}}, @{$argv};
+
+    $self->_validate_config($config);
+}
+
+sub _validate_config {
+    my ($self, $config) = @_;
+
+    if (!$config->{digit} || $config->{digit} !~ m!^\d+$!) {
+        $config->{digit} = 2;
     }
-    elsif ($self->config->{csv}) {
-        $self->_put_delimited_line(',');
+
+    $config->{delimiter} = "\t" unless defined $config->{delimiter};
+
+    if ($config->{fields}) {
+        for my $f ( split ',', $config->{fields} ) {
+            $config->{field}->{$f} = 1;
+        }
+        delete $config->{fields};
     }
     else {
-        $self->_put_table;
+        $config->{field}->{1} = 1;
     }
 }
 
-sub _put_delimited_line {
-    my ($self, $delimiter) = @_;
-
-    my @fields = sort keys %{$self->config->{field}};
-
-    print "\n" unless $self->config->{quiet};
-    print join($delimiter, '', map { $self->_quote($_) } @fields), "\n";
-    for my $col (@RESULT_LIST) {
-        next if !$self->config->{more} && $MORE_RESULT{$col};
-        next if $col eq '_line_';
-        my @rows = ( $self->_quote($col) );
-        for my $i (@fields) {
-            push @rows, $self->_quote( $self->_normalize($self->result->{$i}{$col}) );
-        }
-        print join($delimiter, @rows), "\n";
-    }
-}
-
-sub _quote {
-    my ($self, $value) = @_;
-
-    return $value unless $self->config->{csv};
-    return '"'. $value. '"';
-}
-
-sub _put_table {
-    my $self = shift;
-
-    my @fields = sort keys %{$self->config->{field}};
-
-    my $t = Text::ASCIITable->new;
-    $t->setCols('', @fields);
-    for my $col (@RESULT_LIST) {
-        next if !$self->config->{more} && $MORE_RESULT{$col};
-        if ($col eq '_line_') {
-            $t->addRowLine;
-            next;
-        }
-        my @rows;
-        for my $i (@fields) {
-            push @rows, $self->_normalize($self->result->{$i}{$col});
-        }
-        $t->addRow($col, @rows);
-    }
-    print "\n" unless $self->config->{quiet};
-    print $t;
-}
-
-sub _normalize {
-    my ($self, $value) = @_;
-
-    return '-' unless defined $value;
-
-    if ($value =~ m!\.!) {
-        $value = sprintf("%.". $self->config->{digit}. "f",  $value);
-    }
-
-    unless ($self->config->{no_comma}) {
-        my ($n, $d) = split /\./, $value;
-        while ( $n =~ s!(.*\d)(\d\d\d)!$1,$2! ){};
-        $value = $d ? "$n\.$d" : $n;
-    }
-
-    return $value;
-}
-
-sub _loop {
+sub _main {
     my $self = shift;
 
     my $r = +{};
@@ -119,10 +98,7 @@ sub _loop {
     if ( !is_interactive() ) {
 
         while ( my $line = <STDIN> ) {
-            print $line if $self->config->{through};
-            chomp $line;
-            next unless defined $line;
-            $self->_calc_line($r, [ split $self->config->{delimiter}, $line ]);
+            $self->_loop(\$line => $r);
         }
 
     }
@@ -131,10 +107,7 @@ sub _loop {
         for my $file (@{$self->config->{file}}) {
             open my $fh, '<', $file or die "$file: No such file";
             while ( my $line = <$fh> ) {
-                print $line if $self->config->{through};
-                chomp $line;
-                next unless defined $line;
-                $self->_calc_line($r, [ split $self->config->{delimiter}, $line ]);
+                $self->_loop(\$line => $r);
             }
             close $fh;
         }
@@ -147,16 +120,28 @@ sub _loop {
     $self;
 }
 
+sub _loop {
+    my ($self, $line_ref, $r) = @_;
+
+    my $line = $$line_ref;
+
+    print $line if $self->config->{through};
+    chomp $line;
+    return unless $line;
+    $self->_calc_line($r, [ split $self->config->{delimiter}, $line ]);
+}
+
 sub _calc_line {
     my ($self, $r, $elements) = @_;
 
+    my $strict = $self->config->{strict};
     my $i = 0;
     for my $element (@{$elements}) {
         $i++;
         next unless $self->config->{field}{$i};
-        if ( ($self->config->{strict} && $element =~ m!^(\d+\.?\d+?)$!)
-                || (!$self->config->{strict} && $element =~ m!\d!) ) {
-            my ($num) = ($element =~ m!^(\d+\.?\d+?)!);
+        if ( (!$strict && $element =~ m!\d!)
+                || ($strict && $element =~ m!^(\d+\.?(:?\d+)?)$!) ) {
+            my ($num) = ($element =~ m!^(\d+\.?(:?\d+)?)!);
             $num ||= 0; # FIXME
             $r->{$i}{count}++;
             $r->{$i}{sum} += $num;
@@ -219,59 +204,86 @@ sub _calc_average {
     return $sum / scalar(@{$list});
 }
 
-sub _prepare {
-    my ($self, $argv) = @_;
+sub _finalize {
+    my $self = shift;
 
-    my $config = +{};
-    $self->_merge_opt($config, $argv);
+    return unless $self->result->{show_result};
 
-    $self->config($config);
-
-    $self;
-}
-
-sub _merge_opt {
-    my ($self, $config, $argv) = @_;
-
-    Getopt::Long::Configure('bundling');
-    GetOptionsFromArray(
-        $argv,
-        'file=s@'       => \$config->{file},
-        'd|delimiter=s' => \$config->{delimiter},
-        'f|fields=s'    => \$config->{fields},
-        't|through'     => \$config->{through},
-        'di|digit=i'    => \$config->{digit},
-        's|strict'      => \$config->{strict},
-        'no-comma'      => \$config->{no_comma},
-        'tsv'           => \$config->{tsv},
-        'csv'           => \$config->{csv},
-        'more'          => \$config->{more},
-        'h|help'        => sub {
-            pod2usage(1);
-        },
-        'v|version' => sub {
-            print "cl v$App::LogStats::VERSION\n";
-            exit 1;
-        },
-    ) or pod2usage(2);
-
-    push @{$config->{file}}, @{$argv};
-
-    if (!$config->{digit} || $config->{digit} !~ m!^\d+$!) {
-        $config->{digit} = 2;
+    if ($self->config->{tsv}) {
+        $self->_put_delimited_line("\t");
     }
-
-    $config->{delimiter} = "\t" unless defined $config->{delimiter};
-
-    if ($config->{fields}) {
-        for my $f ( split ',', $config->{fields} ) {
-            $config->{field}->{$f} = 1;
-        }
-        delete $config->{fields};
+    elsif ($self->config->{csv}) {
+        $self->_put_delimited_line(',');
     }
     else {
-        $config->{field}->{1} = 1;
+        $self->_put_table;
     }
+}
+
+sub _put_delimited_line {
+    my ($self, $delimiter) = @_;
+
+    my @fields = sort keys %{$self->config->{field}};
+
+    print "\n" unless $self->config->{quiet};
+    print join($delimiter, '', map { $self->_quote($_) } @fields), "\n";
+    for my $col (@RESULT_LIST) {
+        next if !$self->config->{more} && $MORE_RESULT{$col};
+        next if $col eq '_line_';
+        my @rows = ( $self->_quote($col) );
+        for my $i (@fields) {
+            push @rows, $self->_quote( $self->_normalize($self->result->{$i}{$col}) );
+        }
+        print join($delimiter, @rows), "\n";
+    }
+}
+
+sub _put_table {
+    my $self = shift;
+
+    my @fields = sort keys %{$self->config->{field}};
+
+    my $t = Text::ASCIITable->new;
+    $t->setCols('', @fields);
+    for my $col (@RESULT_LIST) {
+        next if !$self->config->{more} && $MORE_RESULT{$col};
+        if ($col eq '_line_') {
+            $t->addRowLine;
+            next;
+        }
+        my @rows;
+        for my $i (@fields) {
+            push @rows, $self->_normalize($self->result->{$i}{$col});
+        }
+        $t->addRow($col, @rows);
+    }
+    print "\n" unless $self->config->{quiet};
+    print $t;
+}
+
+sub _quote {
+    my ($self, $value) = @_;
+
+    return $value unless $self->config->{csv};
+    return '"'. $value. '"';
+}
+
+sub _normalize {
+    my ($self, $value) = @_;
+
+    return '-' unless defined $value;
+
+    if ($value =~ m!\.!) {
+        $value = sprintf("%.". $self->config->{digit}. 'f',  $value);
+    }
+
+    unless ($self->config->{no_comma}) {
+        my ($n, $d) = split /\./, $value;
+        while ( $n =~ s!(.*\d)(\d\d\d)!$1,$2! ){};
+        $value = $d ? "$n\.$d" : $n;
+    }
+
+    return $value;
 }
 
 1;
