@@ -44,18 +44,18 @@ If you have the log file which include response time, and response time were log
 
 then show the result like this
 
-    .------------------.
-    |         |      7 |
-    +---------+--------+
-    | count   |  3,096 |
-    | sum     | 747.20 |
-    +---------+--------+
-    | average |   0.24 |
-    +---------+--------+
-    | max     |   5.01 |
-    | min     |   0.01 |
-    | range   |      5 |
-    '---------+--------'
+     --------- -------- 
+                     7  
+     --------- -------- 
+      count      3,096  
+      sum       747.20  
+     --------- -------- 
+      average     0.24  
+     --------- -------- 
+      max         5.01  
+      min         0.01  
+      range          5  
+     --------- -------- 
 
 
 =head1 AUTHOR

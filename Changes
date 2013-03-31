@@ -1,5 +1,9 @@
 Revision history for Perl extension App::LogStats
 
+0.021   Sun Mar 31 23:21:38 JST 2013
+    [DOCUMENTATION]
+        - fixed EXAMPLE in bin/stats
+
 0.02    Sun Mar 31 22:05:03 JST 2013
     [IMPROVEMENT]
         - simplified a view of table
