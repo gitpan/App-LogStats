@@ -32,6 +32,7 @@ stats - helps you to calculate data from lines
         -di, --digit         number of the digit after decimal point(default:2)
              --no-comma      not add the comma
         -s,  --strict        treats only the strict numbers field
+             --rc            rc file(default: .statsrc)
         -h,  --help          show this help
         -v,  --version       show the version
 

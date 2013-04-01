@@ -3,7 +3,9 @@ abstract: 'calculate lines'
 author:
   - 'Dai Okabayashi <bayashi@cpan.org>'
 build_requires:
+  Test::Exception: 0
   Test::More: 0.88
+  Test::Output: 0
 configure_requires:
   Module::Build: 0.40
 dynamic_config: 1
@@ -16,7 +18,7 @@ name: App-LogStats
 provides:
   App::LogStats:
     file: lib/App/LogStats.pm
-    version: 0.021
+    version: 0.03
 requires:
   Class::Accessor::Lite: 0
   Getopt::Long: 2.38
@@ -27,4 +29,4 @@ requires:
 resources:
   license: http://dev.perl.org/licenses/
   repository: http://github.com/bayashi/App-LogStats
-version: 0.021
+version: 0.03

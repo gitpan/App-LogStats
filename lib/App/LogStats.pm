@@ -1,12 +1,13 @@
 package App::LogStats;
 use strict;
 use warnings;
+use File::Spec;
 use Getopt::Long qw/GetOptionsFromArray/;
 use Pod::Usage;
 use IO::Interactive qw/is_interactive/;
 use Text::ASCIITable;
 
-our $VERSION = '0.021';
+our $VERSION = '0.03';
 
 use Class::Accessor::Lite (
     new => 1,
@@ -41,12 +42,58 @@ sub run {
 sub _prepare {
     my ($self, $argv) = @_;
 
-    my $config = +{};
+    my $config = $self->_set_rc( $self->_rc_file($argv) );
     $self->_merge_opt($config, $argv);
 
     $self->config($config);
 
     $self;
+}
+
+sub _rc_file {
+    my ($self, $argv) = @_;
+
+    my $rc = 0;
+    for my $opt (@{$argv}) {
+        return $opt if $rc == 1;
+        $rc = 1 if $opt eq '--rc';
+    }
+    return '.statsrc';
+}
+
+sub _set_rc {
+    my ($self, $rc_file) = @_;
+
+    my %config;
+
+    for my $dir ($ENV{STATS_DIR}, $ENV{HOME}, '.') {
+        next unless $dir;
+        my $file = File::Spec->catfile($dir, $rc_file);
+        next unless -e $file;
+        $self->_read_rc($file => \%config);
+    }
+
+    return \%config;
+}
+
+sub _read_rc {
+    my ($self, $file, $config) = @_;
+
+    open my $fh, '<', $file or die "Could not open file: $file";
+    while (<$fh>) {
+        chomp;
+        next if /\A\s*\Z/sm;
+        if (/\A(\w+):\s*(.+)\Z/sm) {
+            my ($key, $value) = ($1, $2);
+            if ($key eq 'file') {
+                push @{$config->{$key}}, $value;
+            }
+            else {
+                $config->{$key} = $value;
+            }
+        }
+    }
+    close $fh;
 }
 
 sub _merge_opt {
@@ -65,11 +112,12 @@ sub _merge_opt {
         'tsv'           => \$config->{tsv},
         'csv'           => \$config->{csv},
         'more'          => \$config->{more},
+        'rc=s'          => \$config->{rc},
         'h|help'        => sub {
             pod2usage(1);
         },
         'v|version' => sub {
-            print "cl v$App::LogStats::VERSION\n";
+            print "stats v$App::LogStats::VERSION\n";
             exit 1;
         },
     ) or pod2usage(2);
@@ -196,9 +244,9 @@ sub _calc_mode {
     return $list->[0] unless @{$list} > 1;
     my %hash;
     $hash{$_}++ for @{$list};
-    my $max_val = ( sort { $hash{$b} <=> $hash{$a} } keys %hash )[0];
+    my $max_val = ( sort { $hash{$b} <=> $hash{$a} } values %hash )[0];
     for my $key (keys %hash) {
-        delete $hash{$key} unless $key == $max_val;
+        delete $hash{$key} unless $hash{$key} == $max_val;
     }
     return $self->_calc_average([keys %hash]);
 }

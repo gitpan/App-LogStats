@@ -114,7 +114,7 @@ test_log(<<'_TXT_', '--more', 'share/log1');
  --------- ------ 
   average   5.50  
   median    5.50  
-  mode         6  
+  mode      5.50  
  --------- ------ 
   max         10  
   min          1  

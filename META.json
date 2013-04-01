@@ -16,7 +16,9 @@
    "prereqs" : {
       "build" : {
          "requires" : {
-            "Test::More" : "0.88"
+            "Test::Exception" : 0,
+            "Test::More" : "0.88",
+            "Test::Output" : 0
          }
       },
       "configure" : {
@@ -38,7 +40,7 @@
    "provides" : {
       "App::LogStats" : {
          "file" : "lib/App/LogStats.pm",
-         "version" : "0.021"
+         "version" : "0.03"
       }
    },
    "release_status" : "stable",
@@ -50,5 +52,5 @@
          "url" : "http://github.com/bayashi/App-LogStats"
       }
    },
-   "version" : "0.021"
+   "version" : "0.03"
 }

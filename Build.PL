@@ -9,6 +9,8 @@ my $builder = Module::Build->new(
     dist_version_from   => 'lib/App/LogStats.pm',
     build_requires      => {
         'Test::More' => 0.88,
+        'Test::Output' => 0,
+        'Test::Exception' => 0,
     },
     requires => {
         'perl' => '5.8.1',
