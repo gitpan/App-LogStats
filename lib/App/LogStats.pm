@@ -7,7 +7,7 @@ use Pod::Usage;
 use IO::Interactive qw/is_interactive/;
 use Text::ASCIITable;
 
-our $VERSION = '0.03';
+our $VERSION = '0.04';
 
 use Class::Accessor::Lite (
     new => 1,
@@ -66,7 +66,7 @@ sub _set_rc {
 
     my %config;
 
-    for my $dir ($ENV{STATS_DIR}, $ENV{HOME}, '.') {
+    for my $dir ($ENV{STATSRC_DIR}, $ENV{HOME}, '.') {
         next unless $dir;
         my $file = File::Spec->catfile($dir, $rc_file);
         next unless -e $file;
@@ -244,7 +244,7 @@ sub _calc_mode {
     return $list->[0] unless @{$list} > 1;
     my %hash;
     $hash{$_}++ for @{$list};
-    my $max_val = ( sort { $hash{$b} <=> $hash{$a} } values %hash )[0];
+    my $max_val = ( sort { $b <=> $a } values %hash )[0];
     for my $key (keys %hash) {
         delete $hash{$key} unless $hash{$key} == $max_val;
     }

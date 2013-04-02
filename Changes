@@ -1,5 +1,12 @@
 Revision history for Perl extension App::LogStats
 
+0.04    Wed Apr  3 08:21:33 JST 2013
+    [BUG FIXES]
+        - fixed the logic for calculating mode
+    [DOCUMENTATION]
+        - added EXAMPLE in bin/stats
+        - wrote the CONFIGURATION section
+
 0.03    Tue Apr  2 00:42:35 JST 2013
     [NEW FEATURE]
         - read custom settings from your '.statsrc' file.
