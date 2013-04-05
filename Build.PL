@@ -11,6 +11,7 @@ my $builder = Module::Build->new(
         'Test::More' => 0.88,
         'Test::Output' => 0,
         'Test::Exception' => 0,
+        'Exporter' => 0,
     },
     requires => {
         'perl' => '5.8.1',
@@ -18,7 +19,7 @@ my $builder = Module::Build->new(
         'Pod::Usage' => 0,
         'IO::Interactive' => 0,
         'Class::Accessor::Lite' => 0,
-        'Text::ASCIITable' => 0,
+        'Text::ASCIITable' => 0.20,
     },
     add_to_cleanup      => [ 'App-LogStats-*' ],
     script_files        => [ 'bin/stats' ],

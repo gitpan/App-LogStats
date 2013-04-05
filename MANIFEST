@@ -13,6 +13,8 @@ share/log3
 t/00_compile.t
 t/01_basic.t
 t/02_run.t
+t/03_line_feed.t
+t/AppLogStatsTest.pm
 xt/01_perlcritic.t
 xt/02_pod-coverage.t
 xt/03_pod.t

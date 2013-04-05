@@ -3,11 +3,10 @@ use strict;
 use warnings;
 use File::Spec;
 use Getopt::Long qw/GetOptionsFromArray/;
-use Pod::Usage;
 use IO::Interactive qw/is_interactive/;
 use Text::ASCIITable;
 
-our $VERSION = '0.04';
+our $VERSION = '0.05';
 
 use Class::Accessor::Lite (
     new => 1,
@@ -112,19 +111,28 @@ sub _merge_opt {
         'tsv'           => \$config->{tsv},
         'csv'           => \$config->{csv},
         'more'          => \$config->{more},
+        'cr'            => \$config->{cr},
+        'crlf'          => \$config->{crlf},
         'rc=s'          => \$config->{rc},
         'h|help'        => sub {
-            pod2usage(1);
+            $self->_show_usage(1);
         },
         'v|version' => sub {
             print "stats v$App::LogStats::VERSION\n";
             exit 1;
         },
-    ) or pod2usage(2);
+    ) or $self->_show_usage(2);
 
     push @{$config->{file}}, @{$argv};
 
     $self->_validate_config($config);
+}
+
+sub _show_usage {
+    my ($self, $exitval) = @_;
+
+    require Pod::Usage;
+    Pod::Usage::pod2usage($exitval);
 }
 
 sub _validate_config {
@@ -266,24 +274,31 @@ sub _finalize {
 
     return unless $self->result->{show_result};
 
+    my $output_lines;
     if ($self->config->{tsv}) {
-        $self->_put_delimited_line("\t");
+        $output_lines = $self->_view_delimited_line("\t");
     }
     elsif ($self->config->{csv}) {
-        $self->_put_delimited_line(',');
+        $output_lines = $self->_view_delimited_line(',');
     }
     else {
-        $self->_put_table;
+        $output_lines = $self->_view_table;
+    }
+
+    my $lf = $self->config->{cr} ? "\r" : $self->config->{crlf} ? "\r\n" : "\n";
+
+    print $lf unless $self->config->{quiet};
+    for my $line ( @{$output_lines} ) {
+        print $line, $lf;
     }
 }
 
-sub _put_delimited_line {
+sub _view_delimited_line {
     my ($self, $delimiter) = @_;
 
     my @fields = sort keys %{$self->config->{field}};
-
-    print "\n" unless $self->config->{quiet};
-    print join($delimiter, '', map { $self->_quote($_) } @fields), "\n";
+    my @output;
+    push @output, join($delimiter, '', map { $self->_quote($_) } @fields);
     for my $col (@RESULT_LIST) {
         next if !$self->config->{more} && $MORE_RESULT{$col};
         next if $col eq '_line_';
@@ -291,11 +306,12 @@ sub _put_delimited_line {
         for my $i (@fields) {
             push @rows, $self->_quote( $self->_normalize($self->result->{$i}{$col}) );
         }
-        print join($delimiter, @rows), "\n";
+        push @output, join($delimiter, @rows);
     }
+    return \@output;
 }
 
-sub _put_table {
+sub _view_table {
     my $self = shift;
 
     my @fields = sort keys %{$self->config->{field}};
@@ -314,8 +330,7 @@ sub _put_table {
         }
         $t->addRow($col, @rows);
     }
-    print "\n" unless $self->config->{quiet};
-    print $t->draw(@DRAW_TABLE);
+    return [ split( "\n", $t->draw(@DRAW_TABLE) ) ];
 }
 
 sub _quote {
@@ -356,8 +371,7 @@ App::LogStats - calculate lines
 
     use App::LogStats;
 
-    my $cl = App::LogStats->new;
-    $cl->run(@ARGV);
+    my $stats = App::LogStats->new->run(@ARGV);
 
 
 =head1 DESCRIPTION

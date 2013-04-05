@@ -3,8 +3,7 @@ use strict;
 use warnings;
 use App::LogStats;
 
-my $stats = App::LogStats->new;
-$stats->run(@ARGV);
+my $stats = App::LogStats->new->run(@ARGV);
 
 __END__
 
@@ -31,6 +30,9 @@ stats - helps you to calculate data from lines
              --csv           show the result as CSV
         -di, --digit         number of the digit after decimal point(default:2)
              --no-comma      not add the comma
+             --crlf          put a line feed as CRLF
+             --cr            put a line feed as CR
+                             (default line feed is LF)
         -s,  --strict        treats only the strict numbers field
              --rc            rc file(default: .statsrc)
         -h,  --help          show this help
