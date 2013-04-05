@@ -4,9 +4,8 @@ use warnings;
 use File::Spec;
 use Getopt::Long qw/GetOptionsFromArray/;
 use IO::Interactive qw/is_interactive/;
-use Text::ASCIITable;
 
-our $VERSION = '0.05';
+our $VERSION = '0.06';
 
 use Class::Accessor::Lite (
     new => 1,
@@ -316,6 +315,7 @@ sub _view_table {
 
     my @fields = sort keys %{$self->config->{field}};
 
+    require Text::ASCIITable;
     my $t = Text::ASCIITable->new;
     $t->setCols('', @fields);
     for my $col (@RESULT_LIST) {

@@ -1,5 +1,9 @@
 Revision history for Perl extension App::LogStats
 
+0.06    Fri Apr  5 09:27:59 JST 2013
+    [IMPROVEMENT]
+        Text::ASCIITable is loaded lazy
+
 0.05    Fri Apr  5 09:04:28 JST 2013
     [NEW FEATURE]
         - new options: --cr and --crlf specify a line feed what you want(default: LF)
