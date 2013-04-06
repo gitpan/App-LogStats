@@ -5,7 +5,7 @@ use File::Spec;
 use Getopt::Long qw/GetOptionsFromArray/;
 use IO::Interactive qw/is_interactive/;
 
-our $VERSION = '0.06';
+our $VERSION = '0.07';
 
 use Class::Accessor::Lite (
     new => 1,
@@ -16,11 +16,13 @@ use Class::Accessor::Lite (
 );
 
 our @RESULT_LIST = (qw/
-    count sum _line_ average median mode _line_ max min range
+    count sum _line_ average median mode _line_ max min range variance stddev
 /);
 our %MORE_RESULT = (
     median => 1,
     mode   => 1,
+    variance => 1,
+    stddev => 1,
 );
 
 our @DRAW_TABLE = (
@@ -223,29 +225,36 @@ sub _after_calc {
 
     for my $i (keys %{$r}) {
         next unless $r->{$i}{count};
-        $r->{$i}{average} = $r->{$i}{sum} / $r->{$i}{count};
-        if ($self->config->{more}) {
-            $r->{$i}{median} = $self->_calc_median($r->{$i}{list});
-            $r->{$i}{mode}   = $self->_calc_mode($r->{$i}{list});
-        }
-        $r->{$i}{range}   = $r->{$i}{max} - $r->{$i}{min};
         $r->{show_result} ||= 1;
+        $r->{$i}{average} = $r->{$i}{sum} / $r->{$i}{count};
+        $r->{$i}{range}   = $r->{$i}{max} - $r->{$i}{min};
+        if ($self->config->{more}) {
+            $r->{$i}{median} = $self->_calc_median($i, $r);
+            $r->{$i}{mode}   = $self->_calc_mode($i, $r);
+            $r->{$i}{variance} = $self->_calc_variance($i, $r);
+            $r->{$i}{stddev} = $self->_calc_stddev($i, $r);
+        }
     }
 }
 
 sub _calc_median {
-    my ($self, $list) = @_;
+    my ($self, $i, $r) = @_;
+
+    my $list = $r->{$i}{list};
 
     return unless ref $list eq 'ARRAY';
     return $list->[0] unless @{$list} > 1;
     @{$list} = sort { $a <=> $b } @{$list};
-    return $list->[ $#{$list} / 2 ] if @{$list} & 1;
-    my $mid = @{$list} / 2;
+    my $element_count = scalar(@{$list});
+    return $list->[ $#{$list} / 2 ] if $element_count & 1;
+    my $mid = $element_count / 2;
     return ( $list->[ $mid - 1 ] + $list->[ $mid ] ) / 2;
 }
 
 sub _calc_mode {
-    my ($self, $list) = @_;
+    my ($self, $i, $r) = @_;
+
+    my $list = $r->{$i}{list};
 
     return unless ref $list eq 'ARRAY';
     return $list->[0] unless @{$list} > 1;
@@ -258,6 +267,25 @@ sub _calc_mode {
     return $self->_calc_average([keys %hash]);
 }
 
+sub _calc_variance {
+    my ($self, $i, $r) = @_;
+
+    my $list = $r->{$i}{list};
+
+    return 0 unless @{$list} > 1;
+    my $average = $r->{$i}{average};
+    return $self->_calc_sum([ map { ($_ - $average) ** 2 } @{$list} ]) / $#{$list};
+}
+
+sub _calc_stddev {
+    my ($self, $i, $r) = @_;
+
+    return 0 unless @{$r->{$i}{list}} > 1;
+    my $variance = defined $r->{$i}{variance}
+        ? $r->{$i}{variance} : $self->_calc_variance($i, $r);
+    return sqrt($variance);
+}
+
 sub _calc_average {
     my ($self, $list) = @_;
 
@@ -266,6 +294,15 @@ sub _calc_average {
         $sum += $i;
     }
     return $sum / scalar(@{$list});
+}
+
+sub _calc_sum {
+    my ($self, $list) = @_;
+
+    my $sum = 0;
+    $sum += $_ for (@{$list});
+
+    return $sum;
 }
 
 sub _finalize {

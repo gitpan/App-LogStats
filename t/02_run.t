@@ -107,20 +107,22 @@ _TXT_
 
 test_stats(<<'_TXT_', '--more', 'share/log1');
 
- --------- ------ 
-               1  
- --------- ------ 
-  count       10  
-  sum         55  
- --------- ------ 
-  average   5.50  
-  median    5.50  
-  mode      5.50  
- --------- ------ 
-  max         10  
-  min          1  
-  range        9  
- --------- ------ 
+ ---------- ------ 
+                1  
+ ---------- ------ 
+  count        10  
+  sum          55  
+ ---------- ------ 
+  average    5.50  
+  median     5.50  
+  mode       5.50  
+ ---------- ------ 
+  max          10  
+  min           1  
+  range         9  
+  variance   9.17  
+  stddev     3.03  
+ ---------- ------ 
 _TXT_
 
 test_stats(<<'_TXT_', '-f1,2', 'share/log2');

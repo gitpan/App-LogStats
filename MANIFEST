@@ -14,6 +14,10 @@ t/00_compile.t
 t/01_basic.t
 t/02_run.t
 t/03_line_feed.t
+t/04_calc_median.t
+t/05_calc_mode.t
+t/06_calc_variance.t
+t/07_calc_stddev.t
 t/AppLogStatsTest.pm
 xt/01_perlcritic.t
 xt/02_pod-coverage.t

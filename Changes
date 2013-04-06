@@ -1,5 +1,9 @@
 Revision history for Perl extension App::LogStats
 
+0.07    Sat Apr  6 20:25:16 JST 2013
+    [NEW FEATURE]
+        - added new stats items: variance and stddev in '--more'
+
 0.06    Fri Apr  5 09:27:59 JST 2013
     [IMPROVEMENT]
         Text::ASCIITable is loaded lazy
