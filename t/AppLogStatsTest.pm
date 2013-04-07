@@ -9,6 +9,14 @@ use App::LogStats;
 use parent qw/Exporter/;
 our @EXPORT_OK = qw/ test_stats /;
 
+sub set_interactive {
+    my $code = shift;
+
+    no warnings 'redefine';
+    *IO::Interactive::Tiny::is_interactive
+        = (ref($code) eq 'CODE') ? $code : sub { 1 };
+}
+
 sub test_stats {
     my ($expect, @cmd) = @_;
 

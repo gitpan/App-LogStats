@@ -5,7 +5,7 @@ use File::Spec;
 use Getopt::Long qw/GetOptionsFromArray/;
 use IO::Interactive::Tiny;
 
-our $VERSION = '0.08';
+our $VERSION = '0.081';
 
 use Class::Accessor::Lite (
     new => 1,

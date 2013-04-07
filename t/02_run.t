@@ -7,10 +7,7 @@ use t::AppLogStatsTest qw/test_stats/;
 
 use App::LogStats;
 
-{
-    no warnings 'redefine';
-    *App::LogStats::is_interactive = sub { 1 };
-}
+t::AppLogStatsTest::set_interactive();
 
 {
     my $stats = App::LogStats->new;
