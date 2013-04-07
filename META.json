@@ -31,7 +31,7 @@
          "requires" : {
             "Class::Accessor::Lite" : 0,
             "Getopt::Long" : "2.38",
-            "IO::Interactive" : 0,
+            "IO::Interactive::Tiny" : 0,
             "Pod::Usage" : 0,
             "Text::ASCIITable" : "0.2",
             "perl" : "v5.8.1"
@@ -41,7 +41,7 @@
    "provides" : {
       "App::LogStats" : {
          "file" : "lib/App/LogStats.pm",
-         "version" : "0.07"
+         "version" : "0.08"
       }
    },
    "release_status" : "stable",
@@ -53,5 +53,5 @@
          "url" : "http://github.com/bayashi/App-LogStats"
       }
    },
-   "version" : "0.07"
+   "version" : "0.08"
 }

@@ -21,7 +21,7 @@ sub test_variance {
     my $stats = App::LogStats->new;
     my $r = +{
         0 => +{
-            average => $stats->_calc_average($list),
+            average => App::LogStats::_calc_average($list),
             list    => $list,
         }
     };

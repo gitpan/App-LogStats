@@ -3,9 +3,9 @@ use strict;
 use warnings;
 use File::Spec;
 use Getopt::Long qw/GetOptionsFromArray/;
-use IO::Interactive qw/is_interactive/;
+use IO::Interactive::Tiny;
 
-our $VERSION = '0.07';
+our $VERSION = '0.08';
 
 use Class::Accessor::Lite (
     new => 1,
@@ -16,13 +16,15 @@ use Class::Accessor::Lite (
 );
 
 our @RESULT_LIST = (qw/
-    count sum _line_ average median mode _line_ max min range variance stddev
+    count sum _line_
+    average median mode _line_
+    max min range variance stddev
 /);
 our %MORE_RESULT = (
-    median => 1,
-    mode   => 1,
+    median   => 1,
+    mode     => 1,
     variance => 1,
-    stddev => 1,
+    stddev   => 1,
 );
 
 our @DRAW_TABLE = (
@@ -161,7 +163,7 @@ sub _main {
 
     my $r = +{};
 
-    if ( !is_interactive() ) {
+    if ( ! IO::Interactive::Tiny::is_interactive(*STDIN) ) {
 
         while ( my $line = <STDIN> ) {
             $self->_loop(\$line => $r);
@@ -213,7 +215,7 @@ sub _calc_line {
             $r->{$i}{sum} += $num;
             $r->{$i}{max}  = $num
                 if !defined $r->{$i}{max} || $num > $r->{$i}{max};
-            $r->{$i}{min} = $num
+            $r->{$i}{min}  = $num
                 if !defined $r->{$i}{min} || $num < $r->{$i}{min};
             push @{$r->{$i}{list}}, $num if $self->config->{more};
         }
@@ -229,10 +231,10 @@ sub _after_calc {
         $r->{$i}{average} = $r->{$i}{sum} / $r->{$i}{count};
         $r->{$i}{range}   = $r->{$i}{max} - $r->{$i}{min};
         if ($self->config->{more}) {
-            $r->{$i}{median} = $self->_calc_median($i, $r);
-            $r->{$i}{mode}   = $self->_calc_mode($i, $r);
+            $r->{$i}{median}   = $self->_calc_median($i, $r);
+            $r->{$i}{mode}     = $self->_calc_mode($i, $r);
             $r->{$i}{variance} = $self->_calc_variance($i, $r);
-            $r->{$i}{stddev} = $self->_calc_stddev($i, $r);
+            $r->{$i}{stddev}   = $self->_calc_stddev($i, $r);
         }
     }
 }
@@ -264,7 +266,7 @@ sub _calc_mode {
     for my $key (keys %hash) {
         delete $hash{$key} unless $hash{$key} == $max_val;
     }
-    return $self->_calc_average([keys %hash]);
+    return _calc_average([keys %hash]);
 }
 
 sub _calc_variance {
@@ -274,7 +276,7 @@ sub _calc_variance {
 
     return 0 unless @{$list} > 1;
     my $average = $r->{$i}{average};
-    return $self->_calc_sum([ map { ($_ - $average) ** 2 } @{$list} ]) / $#{$list};
+    return _calc_sum([ map { ($_ - $average) ** 2 } @{$list} ]) / $#{$list};
 }
 
 sub _calc_stddev {
@@ -287,7 +289,7 @@ sub _calc_stddev {
 }
 
 sub _calc_average {
-    my ($self, $list) = @_;
+    my $list = shift;
 
     my $sum = 0;
     for my $i (@{$list}) {
@@ -297,7 +299,7 @@ sub _calc_average {
 }
 
 sub _calc_sum {
-    my ($self, $list) = @_;
+    my $list = shift;
 
     my $sum = 0;
     $sum += $_ for (@{$list});

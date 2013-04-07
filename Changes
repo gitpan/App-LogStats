@@ -1,5 +1,14 @@
 Revision history for Perl extension App::LogStats
 
+0.08    Sun Apr  7 11:44:31 JST 2013
+    [BUG FIXES]
+        - fixed IO redirect target
+    [IMPROVEMENT]
+        - switched IO::Interactive to IO::Interactive::Tiny
+        - fixed shebang in 'stats'
+        - changed interface of calc util functions
+        - fixed indent
+
 0.07    Sat Apr  6 20:25:16 JST 2013
     [NEW FEATURE]
         - added new stats items: variance and stddev in '--more'

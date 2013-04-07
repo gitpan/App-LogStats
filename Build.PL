@@ -17,7 +17,7 @@ my $builder = Module::Build->new(
         'perl' => '5.8.1',
         'Getopt::Long' => 2.38,
         'Pod::Usage' => 0,
-        'IO::Interactive' => 0,
+        'IO::Interactive::Tiny' => 0,
         'Class::Accessor::Lite' => 0,
         'Text::ASCIITable' => 0.20,
     },
