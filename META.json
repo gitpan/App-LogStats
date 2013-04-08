@@ -41,7 +41,7 @@
    "provides" : {
       "App::LogStats" : {
          "file" : "lib/App/LogStats.pm",
-         "version" : "0.081"
+         "version" : "0.082"
       }
    },
    "release_status" : "stable",
@@ -53,5 +53,5 @@
          "url" : "http://github.com/bayashi/App-LogStats"
       }
    },
-   "version" : "0.081"
+   "version" : "0.082"
 }
