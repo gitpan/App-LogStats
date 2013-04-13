@@ -19,7 +19,8 @@
             "Exporter" : 0,
             "Test::Exception" : 0,
             "Test::More" : "0.88",
-            "Test::Output" : 0
+            "Test::Output" : 0,
+            "parent" : 0
          }
       },
       "configure" : {
@@ -41,7 +42,7 @@
    "provides" : {
       "App::LogStats" : {
          "file" : "lib/App/LogStats.pm",
-         "version" : "0.082"
+         "version" : "0.083"
       }
    },
    "release_status" : "stable",
@@ -53,5 +54,5 @@
          "url" : "http://github.com/bayashi/App-LogStats"
       }
    },
-   "version" : "0.082"
+   "version" : "0.083"
 }
