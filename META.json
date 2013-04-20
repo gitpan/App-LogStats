@@ -4,7 +4,7 @@
       "Dai Okabayashi <bayashi@cpan.org>"
    ],
    "dynamic_config" : 1,
-   "generated_by" : "Module::Build version 0.4003, CPAN::Meta::Converter version 2.112150",
+   "generated_by" : "Module::Build version 0.4004, CPAN::Meta::Converter version 2.130880",
    "license" : [
       "perl_5"
    ],
@@ -16,24 +16,24 @@
    "prereqs" : {
       "build" : {
          "requires" : {
-            "Exporter" : 0,
-            "Test::Exception" : 0,
+            "Exporter" : "0",
+            "Test::Exception" : "0",
             "Test::More" : "0.88",
-            "Test::Output" : 0,
-            "parent" : 0
+            "Test::Output" : "0",
+            "parent" : "0"
          }
       },
       "configure" : {
          "requires" : {
-            "Module::Build" : "0.40"
+            "Module::Build" : "0.38"
          }
       },
       "runtime" : {
          "requires" : {
-            "Class::Accessor::Lite" : 0,
+            "Class::Accessor::Lite" : "0",
             "Getopt::Long" : "2.38",
-            "IO::Interactive::Tiny" : 0,
-            "Pod::Usage" : 0,
+            "IO::Interactive::Tiny" : "0",
+            "Pod::Usage" : "0",
             "Text::ASCIITable" : "0.2",
             "perl" : "v5.8.1"
          }
@@ -42,7 +42,7 @@
    "provides" : {
       "App::LogStats" : {
          "file" : "lib/App/LogStats.pm",
-         "version" : "0.083"
+         "version" : "0.09"
       }
    },
    "release_status" : "stable",
@@ -54,5 +54,5 @@
          "url" : "http://github.com/bayashi/App-LogStats"
       }
    },
-   "version" : "0.083"
+   "version" : "0.09"
 }

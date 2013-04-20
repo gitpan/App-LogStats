@@ -1,5 +1,11 @@
 Revision history for Perl extension App::LogStats
 
+0.09   Sat Apr 20 12:29:37 JST 2013
+    [IMPROVEMENT]
+        - the option '--rc rcfile', it's supported '--rc=rcfile'
+        - try to read '/etc/.statsrc' as system configure
+        - tiny refactor
+
 0.083   Sat Apr 13 10:35:43 JST 2013
     [NO CODE CHANGES]
         - fixed the dependent module list: parent.pm
