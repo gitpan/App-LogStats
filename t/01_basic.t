@@ -4,9 +4,7 @@ use Test::More 0.88;
 
 my $command = 'bin/stats';
 
-ok 1;
-
-if ($ENV{STATS_ALL_TEST}) {
+{
     # version
     system(
         $^X, (map { "-I$_" } @INC),

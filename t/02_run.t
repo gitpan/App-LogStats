@@ -23,7 +23,73 @@ t::AppLogStatsTest::set_interactive();
     } qr/^_no_exists_file_: No such file/, 'no_exists_file';
 }
 
+test_stats('');
+
 test_stats(<<'_TXT_', 'share/log1');
+
+ --------- ------ 
+               1  
+ --------- ------ 
+  count       10  
+  sum         55  
+ --------- ------ 
+  average   5.50  
+ --------- ------ 
+  max         10  
+  min          1  
+  range        9  
+ --------- ------ 
+_TXT_
+
+test_stats(<<"_TXT_", '--tsv', 'share/log1');
+
+\t1
+count\t10
+sum\t55
+average\t5.50
+max\t10
+min\t1
+range\t9
+_TXT_
+
+test_stats(<<"_TXT_", '--csv', 'share/log1');
+
+,"1"
+"count","10"
+"sum","55"
+"average","5.50"
+"max","10"
+"min","1"
+"range","9"
+_TXT_
+
+test_stats(<<'_TXT_', '--strict', 'share/log1');
+
+ --------- ------ 
+               1  
+ --------- ------ 
+  count       10  
+  sum         55  
+ --------- ------ 
+  average   5.50  
+ --------- ------ 
+  max         10  
+  min          1  
+  range        9  
+ --------- ------ 
+_TXT_
+
+test_stats(<<'_TXT_', '--through', 'share/log1');
+1
+2
+3
+4
+5
+6
+7
+8
+9
+10
 
  --------- ------ 
                1  
@@ -222,6 +288,46 @@ test_stats(<<'_TXT_', '-f1,2', '-d,', '--no-comma', 'share/log3');
   min          1100   1200  
   range        2300    200  
  --------- --------- ------ 
+_TXT_
+
+test_stats(<<'_TXT_', '-f1,2', '-d,', '--no-comma', '--more', 'share/log3');
+
+ ---------- ------------ ------- 
+                      1       2  
+ ---------- ------------ ------- 
+  count               3       3  
+  sum              6800    3900  
+ ---------- ------------ ------- 
+  average       2266.67    1300  
+  median           2300    1300  
+  mode          2266.67    1300  
+ ---------- ------------ ------- 
+  max              3400    1400  
+  min              1100    1200  
+  range            2300     200  
+  variance   1323333.33   10000  
+  stddev        1150.36     100  
+ ---------- ------------ ------- 
+_TXT_
+
+test_stats(<<'_TXT_', '--rc', 'share/.statsrc');
+
+ ---------- ------ 
+                1  
+ ---------- ------ 
+  count        10  
+  sum          55  
+ ---------- ------ 
+  average    5.50  
+  median     5.50  
+  mode       5.50  
+ ---------- ------ 
+  max          10  
+  min           1  
+  range         9  
+  variance   9.17  
+  stddev     3.03  
+ ---------- ------ 
 _TXT_
 
 done_testing;

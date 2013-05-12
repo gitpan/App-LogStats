@@ -1,5 +1,11 @@
 Revision history for Perl extension App::LogStats
 
+0.091  Sun May 12 22:21:30 JST 2013
+    [IMPROVEMENT]
+        - support coveralls.io: https://coveralls.io/r/bayashi/App-LogStats
+        - test enhancement
+        - tiny fix
+
 0.09   Sat Apr 20 12:29:37 JST 2013
     [IMPROVEMENT]
         - the option '--rc rcfile', it's supported '--rc=rcfile'

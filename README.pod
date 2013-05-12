@@ -5,7 +5,9 @@ This is Perl module B<App::LogStats>.
 
 =begin html
 
-<a href="http://travis-ci.org/bayashi/App-LogStats"><img src="https://secure.travis-ci.org/bayashi/App-LogStats.png"/></a>
+<a href="http://travis-ci.org/bayashi/App-LogStats"><img src="https://secure.travis-ci.org/bayashi/App-LogStats.png"/></a> <a href="https://coveralls.io/r/bayashi/App-LogStats"><img src="https://coveralls.io/repos/bayashi/App-LogStats/badge.png?branch=master"/></a>
+
+
 
 =end html
 
